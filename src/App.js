@@ -1,19 +1,19 @@
 import axios from 'axios';
 import { format, addMonths } from 'date-fns';
 import React, { useState, useEffect, useRef } from 'react';
-import { Input, Button } from '@material-tailwind/react';
+import { Input, Button, Spinner } from '@material-tailwind/react';
 import { ArrowPathIcon } from '@heroicons/react/24/outline';
 
 import './App.css';
 
 const App = () => {
   const [specialists, setSpecialists] = useState([]);
-  const [municipalities, setMunicipalities] = useState(null);
   const [institutions, setInstitutions] = useState([]);
-  const [filteredSpecialists, setFilteredSpecialists] = useState([]);
-  const [selectedSpecialist, setSelectedSpecialist] = useState([]);
+  const [filteredSpecialists, setFilteredSpecialists] = useState(null);
+  const [selectedSpecialist, setSelectedSpecialist] = useState(null);
   const [search, setSearch] = useState('');
   const [searchResults, setSearchResults] = useState(null);
+  const [searchActive, setSearchActive] = useState(false);
   const [timedSearchActive, setTimedSearchActive] = useState(false);
   const lithuanianToEnglishMap = {
     Ą: 'A',
@@ -59,9 +59,6 @@ const App = () => {
       .get('https://ipr.esveikata.lt/api/searchesNew/specialists')
       .then(({ data }) => setSpecialists(data.data));
     axios
-      .get('https://ipr.esveikata.lt/api/searchesNew/municipalities')
-      .then(({ data }) => setMunicipalities(data.data));
-    axios
       .get('https://ipr.esveikata.lt/api/searchesNew/institutions')
       .then(({ data }) => setInstitutions(data.data));
   }, []);
@@ -71,14 +68,10 @@ const App = () => {
   }, [selectedSpecialist]);
 
   const handleClick = (event, id) => {
-    // searchRef.value = event.target.innerText;
     setSearch(event.target.innerText);
     setSelectedSpecialist(
-      filteredSpecialists.filter((specialist) => specialist.id === id).pop()
+      filteredSpecialists?.filter((specialist) => specialist.id === id).pop()
     );
-
-    // setSelectedSpecialist(filteredSpecialists[key]);
-    // console.log(searchRef.innerText, event.target.innerText);
   };
 
   const getTimeBounds = () => {
@@ -108,10 +101,11 @@ const App = () => {
   };
 
   const handleSearch = (event) => {
-    // axios.post();
+    setSearchActive(true);
 
     const municipality = getMunicipality();
     const { leftBound, rightBound } = getTimeBounds();
+
     axios
       .get('https://ipr.esveikata.lt/api/searches/appointments/times', {
         params: {
@@ -124,7 +118,8 @@ const App = () => {
           size: 50,
         },
       })
-      .then((data) => setSearchResults(data.data.data));
+      .then((data) => setSearchResults(data.data.data))
+      .finally(() => setSearchActive(false));
   };
 
   return (
@@ -132,11 +127,12 @@ const App = () => {
       <header className='bg-yellow-800 text-white font-bold h-12 flex items-center p-4 drop-shadow-md'>
         <h1 className=''>Registracija pas gydytoją</h1>
       </header>
-      <div className='m-40'>
+      <div className='mt-40 m-4'>
+        <h1 className='text-xl font-bold text-center m-4'>Gydytojo paieška</h1>
         <div className='w-full m-auto flex justify-center'>
-          <div className='flex flex-col w-[36rem] md:w-[60rem] gap-6'>
-            <div className='flex gap-2'>
-              <div className='relative flex w-full'>
+          <div className='flex flex-col w-[40rem] md:w-[60rem] gap-6'>
+            <div className='w-full flex items-center flex-col md:flex-row gap-1 md:gap-2'>
+              <div className='relative flex w-full items-center h-16 md:h-10'>
                 <Input
                   inputRef={searchRef}
                   size='md'
@@ -148,17 +144,18 @@ const App = () => {
                   size='sm'
                   color={search ? 'indigo' : 'blue-gray'}
                   disabled={!search}
-                  className='!absolute right-1 top-1 rounded'
+                  className='!absolute right-1 top-4 md:top-1 rounded'
                   onClick={(event) => handleSearch(event)}
                 >
                   Ieškoti
                 </Button>
               </div>
               <Button
+                // disabled={!selectedSpecialist}
                 disabled={true}
                 variant='filled'
                 color='orange'
-                className='flex items-center gap-3 h-10'
+                className='w-full md:w-auto flex justify-between min-w-[13rem] items-center gap-3 h-10 md:h-10 p-2'
                 onClick={(event) => {
                   if (!timedSearchActive) {
                     setTimedSearchActive(true);
@@ -166,12 +163,15 @@ const App = () => {
                   }
                 }}
               >
-                Tikrinti kas 5 minutes
-                <ArrowPathIcon strokeWidth={2} className='h-5 w-5' />
+                <span className='text-left'>Tikrinti kas 5 minutes</span>
+                <ArrowPathIcon strokeWidth={4} className='h-6 w-6' />
               </Button>
             </div>
-            <div ref={filteredResults} className='flex flex-col gap-1'>
-              {filteredSpecialists.map((specialist, key) => (
+            <div
+              ref={filteredResults}
+              className='flex flex-col max-h-[24rem] gap-y-0.5 overflow-scroll'
+            >
+              {filteredSpecialists?.map((specialist, key) => (
                 <button
                   id={specialist.id}
                   key={`specialist-${specialist.id}-${key}`}
@@ -183,59 +183,74 @@ const App = () => {
                 </button>
               ))}
             </div>
-            <h2>{selectedSpecialist.fullName}</h2>
-            <table>
-              <thead>
-                <tr>
-                  <th>Paslauga</th>
-                  <th>Įstaiga</th>
-                  <th>Laikas</th>
-                </tr>
-              </thead>
-              <tbody>
-                {(searchResults?.length > 0 &&
-                  searchResults?.map((result) => {
-                    console.log(selectedSpecialist);
-                    return (
-                      <tr>
-                        <td className='text-left'>
-                          {result.healthcareServiceName ||
-                            'Nerastas paslaugos pavadinimas'}
-                        </td>
-                        <td className='text-left'>
-                          {result.organizationName ||
-                            'Nerastas įstaigos pavadinimas'}
-                        </td>
-                        <td className='text-left'>
-                          {format(
-                            new Date(
-                              new Date(result.earliestTime).toLocaleString(
-                                'en-US',
-                                {
-                                  timeZone: 'Europe/Vilnius',
-                                }
-                              )
-                            ),
-                            'yyyy-MM-dd HH:mm'
-                          ) || 'Nerastas anksčiausias laikas'}
-                        </td>
-                        <td className='text-left'>
-                          <a
-                            className='p-2 border-2 solid border-orange-600 rounded-md'
-                            href={`https://ipr.esveikata.lt/available-registrations?organizationId=${result.organizationId}&serviceId=${result.healthcareServiceId}&practitionerId=${selectedSpecialist.id}&leftBound=${result.earliestTime}`}
-                          >
-                            Registruotis
-                          </a>
-                        </td>
+            {selectedSpecialist && (
+              <>
+                <h2>
+                  {selectedSpecialist?.fullName
+                    ?.match('/^([^(]+)/')
+                    ?.matches[1]?.trim()
+                    ?.split(/\s+/)
+                    ?.join('')}
+                </h2>
+                {searchActive ? (
+                  <div className='w-full flex justify-center'>
+                    <Spinner />
+                  </div>
+                ) : (
+                  <table>
+                    <thead>
+                      <tr className='text-left'>
+                        <th>Paslauga</th>
+                        <th>Įstaiga</th>
+                        <th>Laikas</th>
                       </tr>
-                    );
-                  })) || (
-                  <tr className='p-8'>
-                    <td>Nerasta rezultatų</td>
-                  </tr>
+                    </thead>
+                    <tbody className=''>
+                      {(searchResults?.length > 0 &&
+                        searchResults?.map((result) => {
+                          console.log(selectedSpecialist);
+                          return (
+                            <tr>
+                              <td className='text-left'>
+                                {result.healthcareServiceName ||
+                                  'Nerastas paslaugos pavadinimas'}
+                              </td>
+                              <td className='text-left'>
+                                {result.organizationName ||
+                                  'Nerastas įstaigos pavadinimas'}
+                              </td>
+                              <td className='text-left'>
+                                {format(
+                                  new Date(
+                                    new Date(
+                                      result.earliestTime
+                                    ).toLocaleString('en-US', {
+                                      timeZone: 'Europe/Vilnius',
+                                    })
+                                  ),
+                                  'yyyy-MM-dd HH:mm'
+                                ) || 'Nerastas anksčiausias laikas'}
+                              </td>
+                              <td className='text-left'>
+                                <a
+                                  className='p-2 border-2 solid border-orange-600 rounded-md'
+                                  href={`https://ipr.esveikata.lt/available-registrations?organizationId=${result.organizationId}&serviceId=${result.healthcareServiceId}&practitionerId=${selectedSpecialist.id}&leftBound=${result.earliestTime}`}
+                                >
+                                  Registruotis
+                                </a>
+                              </td>
+                            </tr>
+                          );
+                        })) || (
+                        <tr className='p-8'>
+                          <td>Nerasta rezultatų</td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
                 )}
-              </tbody>
-            </table>
+              </>
+            )}
           </div>
         </div>
       </div>
