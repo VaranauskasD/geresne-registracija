@@ -1,6 +1,12 @@
 import axios from 'axios';
 import classNames from 'classnames';
-import { format, addMonths } from 'date-fns';
+import {
+  format,
+  addMonths,
+  addMinutes,
+  addSeconds,
+  differenceInMilliseconds,
+} from 'date-fns';
 import React, { useState, useEffect, useRef } from 'react';
 import { Input, Button, Spinner } from '@material-tailwind/react';
 import { ArrowPathIcon } from '@heroicons/react/24/outline';
@@ -8,6 +14,7 @@ import { ArrowPathIcon } from '@heroicons/react/24/outline';
 import './App.css';
 
 const App = () => {
+  const searchFrequencyInMinutes = 5;
   const [specialists, setSpecialists] = useState([]);
   const [institutions, setInstitutions] = useState([]);
   const [filteredSpecialists, setFilteredSpecialists] = useState(null);
@@ -31,6 +38,15 @@ const App = () => {
   const filteredResults = useRef(null);
 
   useEffect(() => {
+    axios
+      .get('https://ipr.esveikata.lt/api/searchesNew/specialists')
+      .then(({ data }) => setSpecialists(data.data));
+    axios
+      .get('https://ipr.esveikata.lt/api/searchesNew/institutions')
+      .then(({ data }) => setInstitutions(data.data));
+  }, []);
+
+  useEffect(() => {
     handleSpecialistSearch();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [search, specialists]);
@@ -41,15 +57,6 @@ const App = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedSpecialist]);
-
-  useEffect(() => {
-    axios
-      .get('https://ipr.esveikata.lt/api/searchesNew/specialists')
-      .then(({ data }) => setSpecialists(data.data));
-    axios
-      .get('https://ipr.esveikata.lt/api/searchesNew/institutions')
-      .then(({ data }) => setInstitutions(data.data));
-  }, []);
 
   const handleSpecialistSearch = () => {
     setFilteredSpecialists(
@@ -92,7 +99,6 @@ const App = () => {
     const futureLithuaniaDate = addMonths(currentLithuaniaDate, 6);
     const futureLithuaniaTime = futureLithuaniaDate.getTime();
 
-    console.log();
     return { leftBound: currentLithuaniaTime, rightBound: futureLithuaniaTime };
   };
 
@@ -104,8 +110,27 @@ const App = () => {
     return selectedInstitution?.municipalityId;
   };
 
+  const clearIntervals = async () => {
+    setTimeout(() => {
+      for (var i = setTimeout(function () {}, 0); i > 0; i--) {
+        clearInterval(i);
+        clearTimeout(i);
+        if (cancelAnimationFrame) cancelAnimationFrame(i);
+      }
+    }, 3000);
+  };
+
   const handleTimedSearch = async () => {
-    window.setInterval(() => handleSearch(), 1000);
+    if (timedSearchActive) {
+      setTimedSearchActive(false);
+      clearIntervals();
+    } else {
+      setTimedSearchActive(true);
+      const searchFrequencyInMilliseconds = Math.floor(
+        searchFrequencyInMinutes * 60 * 1000
+      );
+      setInterval(() => handleSearch(), searchFrequencyInMilliseconds);
+    }
   };
 
   const handleSearch = (event) => {
@@ -130,6 +155,23 @@ const App = () => {
       .finally(() => setSearchActive(false));
   };
 
+  const Timer = () => {
+    const [time, setTime] = useState(Date.now());
+    const [timeStamp, setTimeStamp] = useState(
+      searchFrequencyInMinutes > 1
+        ? addMinutes(Date.now(), searchFrequencyInMinutes)
+        : addSeconds(Date.now(), searchFrequencyInMinutes)
+    );
+
+    useEffect(() => {
+      setInterval(() => setTime(Date.now()), 1000);
+    }, []);
+
+    return (
+      <>{format(differenceInMilliseconds(timeStamp, Date.now()), 'mm:ss')}</>
+    );
+  };
+
   return (
     <div className=''>
       <header className='bg-yellow-800 text-white font-bold h-12 flex items-center p-4 drop-shadow-md'>
@@ -150,19 +192,23 @@ const App = () => {
                 />
               </div>
               <Button
-                // disabled={!selectedSpecialist}
-                disabled={true}
-                variant='filled'
+                disabled={!selectedSpecialist}
+                variant={timedSearchActive ? 'outlined' : 'filled'}
                 color='orange'
                 className='w-full md:w-auto flex justify-between min-w-[13rem] items-center gap-3 h-10 md:h-10 p-2'
                 onClick={(event) => {
-                  if (!timedSearchActive) {
-                    setTimedSearchActive(true);
-                    handleTimedSearch(event);
-                  }
+                  handleTimedSearch(event);
                 }}
               >
-                <span className='text-left'>Tikrinti kas 5 minutes</span>
+                <span className='text-left'>
+                  {timedSearchActive ? (
+                    <>
+                      Stabdyti paiešką <Timer />
+                    </>
+                  ) : (
+                    `Tikrinti kas ${searchFrequencyInMinutes} minutes`
+                  )}
+                </span>
                 <ArrowPathIcon strokeWidth={4} className='h-6 w-6' />
               </Button>
             </div>
@@ -224,7 +270,6 @@ const App = () => {
                     <tbody className=''>
                       {(searchResults?.length > 0 &&
                         searchResults?.map((result) => {
-                          console.log(selectedSpecialist);
                           return (
                             <tr>
                               <td className='text-left'>
