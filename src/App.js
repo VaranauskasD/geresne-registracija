@@ -203,6 +203,7 @@ const App = () => {
                         <th>Paslauga</th>
                         <th>Įstaiga</th>
                         <th>Laikas</th>
+                        <th>Nuoroda</th>
                       </tr>
                     </thead>
                     <tbody className=''>
