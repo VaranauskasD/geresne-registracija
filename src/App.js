@@ -126,9 +126,9 @@ const App = () => {
       clearIntervals();
     } else {
       setTimedSearchActive(true);
-      const searchFrequencyInMilliseconds = Math.floor(
-        searchFrequencyInMinutes * 60 * 1000
-      );
+      const searchFrequencyInMilliseconds =
+        searchFrequencyInMinutes * 60 * 1000;
+
       setInterval(() => handleSearch(), searchFrequencyInMilliseconds);
     }
   };
@@ -164,7 +164,16 @@ const App = () => {
     );
 
     useEffect(() => {
-      setInterval(() => setTime(Date.now()), 1000);
+      setInterval(() => {
+        setTime(Date.now());
+        if (timeStamp < Date.now()) {
+          setTimeStamp(
+            searchFrequencyInMinutes > 1
+              ? addMinutes(Date.now(), searchFrequencyInMinutes)
+              : addSeconds(Date.now(), searchFrequencyInMinutes)
+          );
+        }
+      }, 1000);
     }, []);
 
     return (
