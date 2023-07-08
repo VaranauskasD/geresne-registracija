@@ -176,7 +176,7 @@ const App = () => {
                   id={specialist.id}
                   key={`specialist-${specialist.id}-${key}`}
                   type='button'
-                  className='text-left border-2 rounded-md min-h-[52px] p-2'
+                  className='text-left border-2 rounded-md p-2'
                   onClick={(event) => handleClick(event, specialist.id)}
                 >
                   {specialist.fullName}
