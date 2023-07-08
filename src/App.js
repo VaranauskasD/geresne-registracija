@@ -303,6 +303,8 @@ const App = () => {
                               </td>
                               <td className='text-left py-4'>
                                 <a
+                                  target='_blank'
+                                  rel='noreferrer'
                                   className='p-2 border-2 solid border-orange-600 rounded-md'
                                   href={`https://ipr.esveikata.lt/available-registrations?organizationId=${result.organizationId}&serviceId=${result.healthcareServiceId}&practitionerId=${selectedSpecialist.id}&leftBound=${result.earliestTime}`}
                                 >
