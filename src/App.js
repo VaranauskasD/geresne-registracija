@@ -1,4 +1,5 @@
 import axios from 'axios';
+import classNames from 'classnames';
 import { format, addMonths } from 'date-fns';
 import React, { useState, useEffect, useRef } from 'react';
 import { Input, Button, Spinner } from '@material-tailwind/react';
@@ -30,6 +31,27 @@ const App = () => {
   const filteredResults = useRef(null);
 
   useEffect(() => {
+    handleSpecialistSearch();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [search, specialists]);
+
+  useEffect(() => {
+    if (selectedSpecialist) {
+      handleSearch();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedSpecialist]);
+
+  useEffect(() => {
+    axios
+      .get('https://ipr.esveikata.lt/api/searchesNew/specialists')
+      .then(({ data }) => setSpecialists(data.data));
+    axios
+      .get('https://ipr.esveikata.lt/api/searchesNew/institutions')
+      .then(({ data }) => setInstitutions(data.data));
+  }, []);
+
+  const handleSpecialistSearch = () => {
     setFilteredSpecialists(
       specialists?.filter(
         (specialist) =>
@@ -50,27 +72,13 @@ const App = () => {
             )
       )
     );
+  };
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [search, specialists]);
-
-  useEffect(() => {
-    axios
-      .get('https://ipr.esveikata.lt/api/searchesNew/specialists')
-      .then(({ data }) => setSpecialists(data.data));
-    axios
-      .get('https://ipr.esveikata.lt/api/searchesNew/institutions')
-      .then(({ data }) => setInstitutions(data.data));
-  }, []);
-
-  useEffect(() => {
-    console.log(selectedSpecialist);
-  }, [selectedSpecialist]);
-
-  const handleClick = (event, id) => {
-    setSearch(event.target.innerText);
+  const handleClick = async (event, id) => {
     setSelectedSpecialist(
-      filteredSpecialists?.filter((specialist) => specialist.id === id).pop()
+      filteredSpecialists
+        ?.filter((specialist) => specialist.fullName === event.target.value)
+        .pop()
     );
   };
 
@@ -140,15 +148,6 @@ const App = () => {
                   color='indigo'
                   onChange={({ target }) => setSearch(target.value)}
                 />
-                <Button
-                  size='sm'
-                  color={search ? 'indigo' : 'blue-gray'}
-                  disabled={!search}
-                  className='!absolute right-1 top-4 md:top-1 rounded'
-                  onClick={(event) => handleSearch(event)}
-                >
-                  Ieškoti
-                </Button>
               </div>
               <Button
                 // disabled={!selectedSpecialist}
@@ -168,19 +167,35 @@ const App = () => {
               </Button>
             </div>
             <div
+              name='gydytojas'
+              id='gydytojas'
               ref={filteredResults}
               className='flex flex-col max-h-[24rem] gap-y-0.5 overflow-scroll'
             >
               {filteredSpecialists?.map((specialist, key) => (
-                <button
-                  id={specialist.id}
+                <label
                   key={`specialist-${specialist.id}-${key}`}
-                  type='button'
-                  className='text-left border-2 rounded-md p-2'
-                  onClick={(event) => handleClick(event, specialist.id)}
+                  htmlFor={`specialist-${specialist.id}-${key}`}
+                  className={classNames(
+                    'text-left border-2 rounded-md flex items-center p-2 cursor-pointer',
+                    {
+                      'bg-orange-100':
+                        specialist?.fullName === selectedSpecialist?.fullName,
+                    }
+                  )}
                 >
+                  <input
+                    id={`specialist-${specialist.id}-${key}`}
+                    selected={
+                      specialist?.fullName === selectedSpecialist?.fullName
+                    }
+                    value={specialist?.fullName}
+                    type='radio'
+                    className='fixed opacity-0 pointer-events-none'
+                    onClick={(event) => handleClick(event, specialist.id)}
+                  />
                   {specialist.fullName}
-                </button>
+                </label>
               ))}
             </div>
             {selectedSpecialist && (
@@ -232,7 +247,7 @@ const App = () => {
                                   'yyyy-MM-dd HH:mm'
                                 ) || 'Nerastas anksčiausias laikas'}
                               </td>
-                              <td className='text-left'>
+                              <td className='text-left py-4'>
                                 <a
                                   className='p-2 border-2 solid border-orange-600 rounded-md'
                                   href={`https://ipr.esveikata.lt/available-registrations?organizationId=${result.organizationId}&serviceId=${result.healthcareServiceId}&practitionerId=${selectedSpecialist.id}&leftBound=${result.earliestTime}`}
