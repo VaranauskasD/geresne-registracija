@@ -228,7 +228,7 @@ const App = () => {
                 name='gydytojas'
                 id='gydytojas'
                 ref={filteredResults}
-                className='flex flex-col max-h-[24rem] gap-y-0.5 overflow-scroll'
+                className='flex flex-col max-h-[24rem] gap-y-0.5 overflow-y-scroll'
               >
                 {filteredSpecialists?.map((specialist, key) => (
                   <label
