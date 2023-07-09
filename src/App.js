@@ -329,7 +329,7 @@ const App = () => {
             </div>
           </div>
         </div>
-        <div className='flex w-full justify-center items-end'>
+        {/* <div className='flex w-full justify-center items-end'>
           <a
             target='_blank'
             rel='noreferrer'
@@ -343,7 +343,7 @@ const App = () => {
               Ukrainą
             </span>
           </a>
-        </div>
+        </div> */}
       </div>
     </div>
   );
