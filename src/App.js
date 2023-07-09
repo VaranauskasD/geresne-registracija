@@ -186,7 +186,7 @@ const App = () => {
       <header className='bg-yellow-800 text-white font-bold h-12 flex items-center p-4 drop-shadow-md'>
         <h1 className=''>Registracija pas gydytoją</h1>
       </header>
-      <div className='mt-40 m-4 flex flex-col justify-between min-h-screen'>
+      <div className='mt-10 md:mt-40 m-4 flex flex-col min-h-[70vh]'>
         <div>
           <h1 className='text-xl font-bold text-center m-4'>
             Gydytojo paieška
@@ -329,17 +329,17 @@ const App = () => {
             </div>
           </div>
         </div>
-        <div className='flex w-full justify-center items-center m-auto'>
+        <div className='flex w-full justify-center items-end'>
           <a
             target='_blank'
             rel='noreferrer'
             href='https://suukraina.lt/'
-            className='flex flex-col w-full mb-12 rounded border-2 solid border-slate-600 drop-shadow-sm'
+            className='flex flex-col w-full md:w-[16rem] rounded border-2 solid border-slate-600 drop-shadow-sm'
           >
-            <span className='text-center font-bold text-md bg-light-blue-600 text-white'>
+            <span className='text-center font-bold text-md bg-light-blue-600 text-white p-2'>
               Paremti
             </span>
-            <span className='text-center font-bold text-md bg-yellow-600 text-white'>
+            <span className='text-center font-bold text-md bg-yellow-600 text-white p-2'>
               Ukrainą
             </span>
           </a>
