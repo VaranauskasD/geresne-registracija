@@ -35,8 +35,6 @@ const App = () => {
     Ū: 'U',
     Ž: 'Z',
   };
-  const searchRef = useRef(null);
-  const filteredResults = useRef(null);
 
   useEffect(() => {
     axios
@@ -210,11 +208,10 @@ const App = () => {
             Gydytojo paieška
           </h1>
           <div className='w-full flex justify-center'>
-            <div className='m-auto flex w-[40rem] md:w-[60rem] gap-6 flex-col'>
+            <div className='m-auto flex w-[40rem] md:w-[60rem] gap-6 flex-col drop-shadow-sm'>
               <div className='w-full flex items-center flex-col md:flex-row gap-1 md:gap-2'>
                 <div className='relative flex w-full items-center h-16 md:h-10'>
                   <Input
-                    inputRef={searchRef}
                     size='md'
                     aria-label='Iveskite gydytojo vardą'
                     label='Vardas'
@@ -246,17 +243,16 @@ const App = () => {
               <div
                 name='gydytojas'
                 id='gydytojas'
-                ref={filteredResults}
-                className='flex flex-col max-h-[24rem] gap-y-0.5 overflow-y-scroll'
+                className='flex flex-col max-h-[24rem] overflow-y-scroll gap-y-0.5 '
               >
                 {filteredSpecialists?.map((specialist, key) => (
                   <label
                     key={`specialist-${specialist.id}-${key}`}
                     htmlFor={`specialist-${specialist.id}-${key}`}
                     className={classNames(
-                      'text-left border-2 rounded-md flex items-center p-2 cursor-pointer',
+                      'text-left border-b-2 rounded-md flex items-center p-2 cursor-pointer hover:bg-orange-50 hover:bg-opacity-50',
                       {
-                        'bg-orange-100':
+                        'bg-orange-100 hover:bg-orange-100 hover:bg-opacity-100':
                           specialist?.fullName === selectedSpecialist?.fullName,
                       }
                     )}
@@ -277,12 +273,14 @@ const App = () => {
               </div>
               {selectedSpecialist && (
                 <>
-                  <h2>
-                    {selectedSpecialist?.fullName
-                      ?.match('/^([^(]+)/')
-                      ?.matches[1]?.trim()
-                      ?.split(/\s+/)
-                      ?.join('')}
+                  <h2 className='font-bold'>
+                    {
+                      selectedSpecialist?.fullName
+                      // ?.match('/^([^(]+)/')
+                      // ?.matches[1]?.trim()
+                      // ?.split(/\s+/)
+                      // ?.join('')}
+                    }
                   </h2>
                   {searchActive ? (
                     <div className='w-full flex justify-center'>
@@ -298,11 +296,11 @@ const App = () => {
                           <th>Nuoroda</th>
                         </tr>
                       </thead>
-                      <tbody className=''>
+                      <tbody>
                         {(searchResults?.length > 0 &&
                           searchResults?.map((result) => {
                             return (
-                              <tr>
+                              <tr className='text-left border-b-2 p-2 cursor-pointer'>
                                 <td className='text-left'>
                                   {result.healthcareServiceName ||
                                     'Nerastas paslaugos pavadinimas'}
@@ -336,12 +334,17 @@ const App = () => {
                               </tr>
                             );
                           })) || (
-                          <tr className='p-8'>
-                            <td colSpan={4}>
-                              Nerasta rezultatų. Naudokite automatinę paiešką
-                              norėdami gauti rezultatus, kai atsiras talonėlių.
-                            </td>
-                          </tr>
+                          <>
+                            <tr>
+                              <td colSpan={4}>Nerasta rezultatų.</td>
+                            </tr>
+                            <tr>
+                              <td colSpan={4}>
+                                Naudokite automatinę paiešką norėdami gauti
+                                rezultatus, kai atsiras talonėlių.
+                              </td>
+                            </tr>
+                          </>
                         )}
                       </tbody>
                     </table>
