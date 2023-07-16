@@ -204,7 +204,7 @@ const App = () => {
       <header className='bg-yellow-800 text-white font-bold h-12 flex items-center p-4 drop-shadow-md'>
         <h1>Registracija pas gydytoją</h1>
       </header>
-      <div className='mt-10 md:mt-40 m-4 flex flex-col min-h-[70vh]'>
+      <div className='mt-4 md:mt-40 m-4 flex flex-col min-h-[70vh]'>
         <div>
           <h1 className='text-xl font-bold text-center m-4'>
             Gydytojo paieška
