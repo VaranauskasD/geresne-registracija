@@ -23,7 +23,6 @@ const App = () => {
   const [searchResults, setSearchResults] = useState(null);
   const [searchActive, setSearchActive] = useState(false);
   const [timedSearchActive, setTimedSearchActive] = useState(false);
-  const [searchInputChange, setSearchInputChange] = useState(false);
   const lithuanianToEnglishMap = {
     Ą: 'A',
     Č: 'C',
@@ -98,7 +97,7 @@ const App = () => {
   };
 
   const handleClick = async (event, id) => {
-    window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+    window.scrollTo({ top: 0, left: 0 });
     setSelectedSpecialist(
       filteredSpecialists
         ?.filter((specialist) => specialist.fullName === event.target.value)
@@ -203,7 +202,7 @@ const App = () => {
       <header className='bg-yellow-800 text-white font-bold h-12 flex items-center p-4 drop-shadow-md'>
         <h1>Registracija pas gydytoją</h1>
       </header>
-      <div className='mt-4 md:mt-40 m-4 flex flex-col min-h-[70vh]'>
+      <div className='mt-4 md:mt-24 m-4 flex flex-col min-h-[70vh]'>
         <div>
           <h1 className='text-xl font-bold text-center m-4'>
             Gydytojo paieška
@@ -241,40 +240,43 @@ const App = () => {
                   <ArrowPathIcon strokeWidth={4} className='h-6 w-6' />
                 </Button>
               </div>
-              <div
+              <ul
+                aria-label={'Gydytojai'}
                 name='gydytojas'
                 id='gydytojas'
                 className='flex flex-col max-h-[24rem] overflow-y-scroll gap-y-0.5 '
               >
                 {filteredSpecialists?.map((specialist, key) => (
-                  <label
-                    key={`specialist-${specialist.id}-${key}`}
-                    htmlFor={`specialist-${specialist.id}-${key}`}
-                    className={classNames(
-                      'text-left border-b-2 rounded-md flex items-center p-2 cursor-pointer hover:bg-orange-50 hover:bg-opacity-50',
-                      {
-                        'bg-orange-100 hover:bg-orange-100 hover:bg-opacity-100':
-                          specialist?.fullName === selectedSpecialist?.fullName,
-                      }
-                    )}
-                  >
-                    <input
-                      id={`specialist-${specialist.id}-${key}`}
-                      selected={
-                        specialist?.fullName === selectedSpecialist?.fullName
-                      }
-                      value={specialist?.fullName}
-                      type='radio'
-                      className='fixed opacity-0 pointer-events-none'
-                      onClick={(event) => handleClick(event, specialist.id)}
-                    />
-                    {specialist.fullName}
-                  </label>
+                  <li key={`specialist-${specialist.id}-${key}`}>
+                    <label
+                      htmlFor={`specialist-${specialist.id}-${key}`}
+                      className={classNames(
+                        'text-left border-b-2 rounded-md flex items-center p-2 cursor-pointer hover:bg-orange-50 hover:bg-opacity-50',
+                        {
+                          'bg-orange-100 hover:bg-orange-100 hover:bg-opacity-100':
+                            specialist?.fullName ===
+                            selectedSpecialist?.fullName,
+                        }
+                      )}
+                    >
+                      <input
+                        id={`specialist-${specialist.id}-${key}`}
+                        selected={
+                          specialist?.fullName === selectedSpecialist?.fullName
+                        }
+                        value={specialist?.fullName}
+                        type='radio'
+                        className='fixed opacity-0 pointer-events-none'
+                        onClick={(event) => handleClick(event, specialist.id)}
+                      />
+                      {specialist.fullName}
+                    </label>
+                  </li>
                 ))}
-              </div>
+              </ul>
               {selectedSpecialist && (
-                <>
-                  <h2 className='font-bold'>
+                <div className='pt-6'>
+                  <h2 className='font-bold mb-2'>
                     {
                       selectedSpecialist?.fullName
                       // ?.match('/^([^(]+)/')
@@ -288,7 +290,7 @@ const App = () => {
                       <Spinner />
                     </div>
                   ) : (
-                    <table>
+                    <table className='drop-shadow-sm'>
                       <thead>
                         <tr className='text-left'>
                           <th>Paslauga</th>
@@ -297,24 +299,27 @@ const App = () => {
                           <th>Nuoroda</th>
                         </tr>
                       </thead>
-                      <tbody>
+                      <tbody className='border-t-[16px] border-transparent max-h-[260px] overflow-scroll'>
                         {(searchResults?.length > 0 &&
                           searchResults?.map((result) => {
                             return (
-                              <tr className='text-left border-b-2 p-2 cursor-pointer'>
+                              <tr
+                                key={`${result?.healthcareServiceName}-${result?.organizationName}`}
+                                className='text-left border-b-2 p-2 cursor-pointer'
+                              >
                                 <td className='text-left'>
-                                  {result.healthcareServiceName ||
+                                  {result?.healthcareServiceName ||
                                     'Nerastas paslaugos pavadinimas'}
                                 </td>
                                 <td className='text-left'>
-                                  {result.organizationName ||
+                                  {result?.organizationName ||
                                     'Nerastas įstaigos pavadinimas'}
                                 </td>
                                 <td className='text-left'>
                                   {format(
                                     new Date(
                                       new Date(
-                                        result.earliestTime
+                                        result?.earliestTime
                                       ).toLocaleString('en-US', {
                                         timeZone: 'Europe/Vilnius',
                                       })
@@ -350,7 +355,7 @@ const App = () => {
                       </tbody>
                     </table>
                   )}
-                </>
+                </div>
               )}
             </div>
           </div>
