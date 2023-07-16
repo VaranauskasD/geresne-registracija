@@ -23,6 +23,7 @@ const App = () => {
   const [searchResults, setSearchResults] = useState(null);
   const [searchActive, setSearchActive] = useState(false);
   const [timedSearchActive, setTimedSearchActive] = useState(false);
+  const [searchInputChange, setSearchInputChange] = useState(false);
   const lithuanianToEnglishMap = {
     Ą: 'A',
     Č: 'C',
@@ -56,7 +57,11 @@ const App = () => {
   }, []);
 
   useEffect(() => {
-    handleSpecialistSearch();
+    if (search?.length > 2) {
+      handleSpecialistSearch();
+    } else {
+      setFilteredSpecialists(null);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [search, specialists]);
 
