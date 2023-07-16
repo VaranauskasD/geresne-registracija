@@ -40,7 +40,16 @@ const App = () => {
   useEffect(() => {
     axios
       .get('https://ipr.esveikata.lt/api/searchesNew/specialists')
-      .then(({ data }) => setSpecialists(data.data));
+      .then(({ data }) => {
+        const returnedSpecialists = data.data;
+        const chunkSize = 500;
+        const chunkedSpecialists = [];
+        for (let i = 0; i < returnedSpecialists.length; i += chunkSize) {
+          const specialistsChunk = returnedSpecialists.slice(i, i + chunkSize);
+          chunkedSpecialists.push(specialistsChunk);
+        }
+        setSpecialists(chunkedSpecialists);
+      });
     axios
       .get('https://ipr.esveikata.lt/api/searchesNew/institutions')
       .then(({ data }) => setInstitutions(data.data));
@@ -58,26 +67,34 @@ const App = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedSpecialist]);
 
+  useEffect(() => {
+    console.log(filteredSpecialists);
+  }, [filteredSpecialists]);
+
   const handleSpecialistSearch = () => {
     setFilteredSpecialists(
-      specialists?.filter(
-        (specialist) =>
-          search.length > 0 &&
-          specialist?.fullName
-            ?.toUpperCase()
-            ?.replace(
-              /[ĄČĘĖĮŠŲŪŽ]/g,
-              (match) => lithuanianToEnglishMap[match] || match
-            )
-            ?.includes(
-              search
+      specialists
+        ?.map((specialistsChunk) =>
+          specialistsChunk?.filter(
+            (specialist) =>
+              search.length > 0 &&
+              specialist?.fullName
                 ?.toUpperCase()
                 ?.replace(
                   /[ĄČĘĖĮŠŲŪŽ]/g,
                   (match) => lithuanianToEnglishMap[match] || match
                 )
-            )
-      )
+                ?.includes(
+                  search
+                    ?.toUpperCase()
+                    ?.replace(
+                      /[ĄČĘĖĮŠŲŪŽ]/g,
+                      (match) => lithuanianToEnglishMap[match] || match
+                    )
+                )
+          )
+        )
+        ?.flat()
     );
   };
 
