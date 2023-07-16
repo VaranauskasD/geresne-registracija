@@ -98,6 +98,7 @@ const App = () => {
   };
 
   const handleClick = async (event, id) => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
     setSelectedSpecialist(
       filteredSpecialists
         ?.filter((specialist) => specialist.fullName === event.target.value)
