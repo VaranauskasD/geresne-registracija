@@ -67,10 +67,6 @@ const App = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedSpecialist]);
 
-  useEffect(() => {
-    console.log(filteredSpecialists);
-  }, [filteredSpecialists]);
-
   const handleSpecialistSearch = () => {
     setFilteredSpecialists(
       specialists
