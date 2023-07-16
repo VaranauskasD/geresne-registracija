@@ -337,7 +337,10 @@ const App = () => {
                             );
                           })) || (
                           <tr className='p-8'>
-                            <td>Nerasta rezultatų</td>
+                            <td colSpan={4}>
+                              Nerasta rezultatų. Naudokite automatinę paiešką
+                              norėdami gauti rezultatus, kai atsiras talonėlių.
+                            </td>
                           </tr>
                         )}
                       </tbody>
