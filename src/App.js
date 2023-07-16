@@ -184,7 +184,7 @@ const App = () => {
   return (
     <div className=''>
       <header className='bg-yellow-800 text-white font-bold h-12 flex items-center p-4 drop-shadow-md'>
-        <h1 className=''>Registracija pas gydytoją</h1>
+        <h1>Registracija pas gydytoją</h1>
       </header>
       <div className='mt-10 md:mt-40 m-4 flex flex-col min-h-[70vh]'>
         <div>
@@ -198,6 +198,7 @@ const App = () => {
                   <Input
                     inputRef={searchRef}
                     size='md'
+                    aria-label='Iveskite gydytojo vardą'
                     label='Vardas'
                     color='indigo'
                     onChange={({ target }) => setSearch(target.value)}
