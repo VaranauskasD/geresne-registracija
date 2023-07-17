@@ -268,7 +268,7 @@ const App = () => {
               aria-label={'Gydytojai'}
               name='gydytojas'
               id='gydytojas'
-              className='flex flex-col max-h-[20rem] md:max-h-[24rem] overflow-y-scroll gap-y-0.5 '
+              className='flex flex-col max-h-[24rem] overflow-y-scroll gap-y-0.5 '
             >
               {filteredSpecialists?.map((specialist, key) => (
                 <li key={`specialist-${specialist.id}-${key}`}>
