@@ -290,7 +290,7 @@ const App = () => {
                       <Spinner />
                     </div>
                   ) : (
-                    <table className='drop-shadow-sm'>
+                    <table className='drop-shadow-sm w-full'>
                       <thead>
                         <tr className='text-left'>
                           <th>Paslauga</th>
