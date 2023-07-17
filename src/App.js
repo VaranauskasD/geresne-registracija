@@ -97,7 +97,6 @@ const App = () => {
   };
 
   const handleClick = async (event, id) => {
-    window.scrollTo({ top: 0, left: 0 });
     setSelectedSpecialist(
       filteredSpecialists
         ?.filter((specialist) => specialist.fullName === event.target.value)
@@ -208,7 +207,7 @@ const App = () => {
             Gydytojo paieška
           </h1>
           <div className='w-full flex justify-center'>
-            <div className='m-auto flex w-[40rem] md:w-[60rem] gap-6 flex-col drop-shadow-sm'>
+            <div className='m-auto flex w-[40rem] md:w-[60rem] gap-6 flex-col'>
               <div className='w-full flex items-center flex-col md:flex-row gap-1 md:gap-2'>
                 <div className='relative flex w-full items-center h-16 md:h-10'>
                   <Input
