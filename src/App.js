@@ -228,168 +228,165 @@ const App = () => {
       <header className='bg-yellow-800 text-white font-bold h-12 flex items-center p-4 drop-shadow-md'>
         <h1>Registracija pas gydytoją</h1>
       </header>
-      <div className='mt-4 md:mt-24 m-4 flex flex-col min-h-[70vh]'>
-        <div>
-          <h1 className='text-xl font-bold text-center m-4'>
-            Gydytojo paieška
-          </h1>
-          <div className='w-full flex justify-center'>
-            <div className='m-auto flex w-[40rem] md:w-[60rem] gap-6 flex-col overflow-hidden'>
-              <div className='w-full flex items-center flex-col md:flex-row gap-1 md:gap-2'>
-                <div className='relative flex w-full items-center h-16 md:h-10'>
-                  <Input
-                    size='md'
-                    aria-label='Iveskite gydytojo vardą'
-                    label='Vardas'
-                    color='indigo'
-                    onChange={({ target }) => setSearch(target.value)}
-                  />
-                </div>
-                <Button
-                  disabled={!selectedSpecialist}
-                  variant={timedSearchActive ? 'outlined' : 'filled'}
-                  color='orange'
-                  className='w-full md:w-auto flex justify-between min-w-[13rem] items-center gap-3 h-10 md:h-10 p-2'
-                  onClick={(event) => {
-                    handleTimedSearch(event);
-                  }}
-                >
-                  <span className='text-left'>
-                    {timedSearchActive ? (
-                      <>
-                        Stabdyti paiešką <Timer />
-                      </>
-                    ) : (
-                      `Tikrinti kas ${searchFrequencyInMinutes} minutes`
-                    )}
-                  </span>
-                  <ArrowPathIcon strokeWidth={4} className='h-6 w-6' />
-                </Button>
+      <div className='mt-4 md:mt-24 m-4 flex flex-col min-h-[70vh] px-2 md:p-0'>
+        {/* <div> */}
+        <h1 className='text-xl font-bold text-center m-4'>Gydytojo paieška</h1>
+        <div className='w-full flex justify-center'>
+          <div className='m-auto flex w-[40rem] md:w-[60rem] gap-6 flex-col overflow-hidden'>
+            <div className='w-full flex items-center flex-col md:flex-row gap-1 md:gap-2'>
+              <div className='relative flex w-full items-center h-16 md:h-10'>
+                <Input
+                  size='md'
+                  aria-label='Iveskite gydytojo vardą'
+                  label='Vardas'
+                  color='indigo'
+                  onChange={({ target }) => setSearch(target.value)}
+                />
               </div>
-              <ul
-                aria-label={'Gydytojai'}
-                name='gydytojas'
-                id='gydytojas'
-                className='flex flex-col max-h-[24rem] overflow-y-scroll gap-y-0.5 '
+              <Button
+                disabled={!selectedSpecialist}
+                variant={timedSearchActive ? 'outlined' : 'filled'}
+                color='orange'
+                className='w-full md:w-auto flex justify-between min-w-[13rem] items-center gap-3 h-10 md:h-10 p-2'
+                onClick={(event) => {
+                  handleTimedSearch(event);
+                }}
               >
-                {filteredSpecialists?.map((specialist, key) => (
-                  <li key={`specialist-${specialist.id}-${key}`}>
-                    <label
-                      htmlFor={`specialist-${specialist.id}-${key}`}
-                      className={classNames(
-                        'text-left border-b-2 rounded-md flex items-center p-2 cursor-pointer hover:bg-orange-50 hover:bg-opacity-50',
-                        {
-                          'bg-orange-100 hover:bg-orange-100 hover:bg-opacity-100':
-                            specialist?.fullName ===
-                            selectedSpecialist?.fullName,
-                        }
-                      )}
-                    >
-                      <input
-                        id={`specialist-${specialist.id}-${key}`}
-                        selected={
-                          specialist?.fullName === selectedSpecialist?.fullName
-                        }
-                        value={specialist?.fullName}
-                        type='radio'
-                        className='fixed opacity-0 pointer-events-none'
-                        onClick={(event) => handleClick(event, specialist.id)}
-                      />
-                      {specialist.fullName}
-                    </label>
-                  </li>
-                ))}
-              </ul>
-              {selectedSpecialist && (
-                <div className='pt-6'>
-                  <h2 className='font-bold mb-2'>
-                    {
-                      selectedSpecialist?.fullName
-                      // ?.match('/^([^(]+)/')
-                      // ?.matches[1]?.trim()
-                      // ?.split(/\s+/)
-                      // ?.join('')}
-                    }
-                  </h2>
-                  {searchActive ? (
-                    <div className='w-full flex justify-center'>
-                      <Spinner />
-                    </div>
+                <span className='text-left'>
+                  {timedSearchActive ? (
+                    <>
+                      Stabdyti paiešką <Timer />
+                    </>
                   ) : (
-                    <table className='drop-shadow-sm w-full'>
-                      <thead>
-                        <tr className='text-left'>
-                          <th>Paslauga</th>
-                          {!isMobile && <th>Įstaiga</th>}
-                          <th>Laikas</th>
-                          <th>Nuoroda</th>
-                        </tr>
-                      </thead>
-                      <tbody className='border-t-[16px] border-transparent max-h-[260px] overflow-scroll'>
-                        {(searchResults?.length > 0 &&
-                          searchResults?.map((result) => {
-                            return (
-                              <tr
-                                key={`${result?.healthcareServiceName}-${result?.organizationName}`}
-                                className='text-left border-b-2 p-2 cursor-pointer'
-                              >
-                                <td className='text-left'>
-                                  {result?.healthcareServiceName ||
-                                    'Nerastas paslaugos pavadinimas'}
-                                </td>
-                                {!isMobile && (
-                                  <td className='text-left'>
-                                    {result?.organizationName ||
-                                      'Nerastas įstaigos pavadinimas'}
-                                  </td>
-                                )}
-                                <td className='text-left'>
-                                  {format(
-                                    new Date(
-                                      new Date(
-                                        result?.earliestTime
-                                      ).toLocaleString('en-US', {
-                                        timeZone: 'Europe/Vilnius',
-                                      })
-                                    ),
-                                    'yyyy-MM-dd HH:mm'
-                                  ) || 'Nerastas anksčiausias laikas'}
-                                </td>
-                                <td className='text-left py-4'>
-                                  <a
-                                    target='_blank'
-                                    rel='noreferrer'
-                                    className='p-2 border-2 solid border-orange-600 rounded-md'
-                                    href={`https://ipr.esveikata.lt/available-registrations?organizationId=${result.organizationId}&serviceId=${result.healthcareServiceId}&practitionerId=${selectedSpecialist.id}&leftBound=${result.earliestTime}`}
-                                  >
-                                    Registruotis
-                                  </a>
-                                </td>
-                              </tr>
-                            );
-                          })) || (
-                          <>
-                            <tr>
-                              <td colSpan={isMobile ? 3 : 4}>
-                                Nerasta rezultatų.
-                              </td>
-                            </tr>
-                            <tr>
-                              <td colSpan={isMobile ? 3 : 4}>
-                                Naudokite automatinę paiešką norėdami gauti
-                                rezultatus, kai atsiras talonėlių.
-                              </td>
-                            </tr>
-                          </>
-                        )}
-                      </tbody>
-                    </table>
+                    `Tikrinti kas ${searchFrequencyInMinutes} minutes`
                   )}
-                </div>
-              )}
+                </span>
+                <ArrowPathIcon strokeWidth={4} className='h-6 w-6' />
+              </Button>
             </div>
+            <ul
+              aria-label={'Gydytojai'}
+              name='gydytojas'
+              id='gydytojas'
+              className='flex flex-col max-h-[20rem] md:max-h-[24rem] overflow-y-scroll gap-y-0.5 '
+            >
+              {filteredSpecialists?.map((specialist, key) => (
+                <li key={`specialist-${specialist.id}-${key}`}>
+                  <label
+                    htmlFor={`specialist-${specialist.id}-${key}`}
+                    className={classNames(
+                      'text-left border-b-2 rounded-md flex items-center p-2 cursor-pointer hover:bg-orange-50 hover:bg-opacity-50',
+                      {
+                        'bg-orange-100 hover:bg-orange-100 hover:bg-opacity-100':
+                          specialist?.fullName === selectedSpecialist?.fullName,
+                      }
+                    )}
+                  >
+                    <input
+                      id={`specialist-${specialist.id}-${key}`}
+                      selected={
+                        specialist?.fullName === selectedSpecialist?.fullName
+                      }
+                      value={specialist?.fullName}
+                      type='radio'
+                      className='fixed opacity-0 pointer-events-none'
+                      onClick={(event) => handleClick(event, specialist.id)}
+                    />
+                    {specialist.fullName}
+                  </label>
+                </li>
+              ))}
+            </ul>
+            {selectedSpecialist && (
+              <div className='pt-6'>
+                <h2 className='font-bold mb-2'>
+                  {
+                    selectedSpecialist?.fullName
+                    // ?.match('/^([^(]+)/')
+                    // ?.matches[1]?.trim()
+                    // ?.split(/\s+/)
+                    // ?.join('')}
+                  }
+                </h2>
+                {searchActive ? (
+                  <div className='w-full flex justify-center'>
+                    <Spinner />
+                  </div>
+                ) : (
+                  <table className='drop-shadow-sm w-full'>
+                    <thead>
+                      <tr className='text-left'>
+                        <th>Paslauga</th>
+                        {!isMobile && <th>Įstaiga</th>}
+                        <th>Laikas</th>
+                        <th>Nuoroda</th>
+                      </tr>
+                    </thead>
+                    <tbody className='border-t-[16px] border-transparent max-h-[260px] overflow-scroll'>
+                      {(searchResults?.length > 0 &&
+                        searchResults?.map((result) => {
+                          return (
+                            <tr
+                              key={`${result?.healthcareServiceName}-${result?.organizationName}`}
+                              className='text-left border-b-2 p-2 cursor-pointer'
+                            >
+                              <td className='text-left'>
+                                {result?.healthcareServiceName ||
+                                  'Nerastas paslaugos pavadinimas'}
+                              </td>
+                              {!isMobile && (
+                                <td className='text-left'>
+                                  {result?.organizationName ||
+                                    'Nerastas įstaigos pavadinimas'}
+                                </td>
+                              )}
+                              <td className='text-left'>
+                                {format(
+                                  new Date(
+                                    new Date(
+                                      result?.earliestTime
+                                    ).toLocaleString('en-US', {
+                                      timeZone: 'Europe/Vilnius',
+                                    })
+                                  ),
+                                  'yyyy-MM-dd HH:mm'
+                                ) || 'Nerastas anksčiausias laikas'}
+                              </td>
+                              <td className='text-left py-4'>
+                                <a
+                                  target='_blank'
+                                  rel='noreferrer'
+                                  className='p-2 border-2 solid border-orange-600 rounded-md'
+                                  href={`https://ipr.esveikata.lt/available-registrations?organizationId=${result.organizationId}&serviceId=${result.healthcareServiceId}&practitionerId=${selectedSpecialist.id}&leftBound=${result.earliestTime}`}
+                                >
+                                  Registruotis
+                                </a>
+                              </td>
+                            </tr>
+                          );
+                        })) || (
+                        <>
+                          <tr>
+                            <td colSpan={isMobile ? 3 : 4}>
+                              Nerasta rezultatų.
+                            </td>
+                          </tr>
+                          <tr>
+                            <td colSpan={isMobile ? 3 : 4}>
+                              Naudokite automatinę paiešką norėdami gauti
+                              rezultatus, kai atsiras talonėlių.
+                            </td>
+                          </tr>
+                        </>
+                      )}
+                    </tbody>
+                  </table>
+                )}
+              </div>
+            )}
           </div>
         </div>
+        {/* </div> */}
         {/* <div className='flex w-full justify-center items-end'>
           <a
             target='_blank'
