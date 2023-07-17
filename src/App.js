@@ -7,11 +7,23 @@ import {
   addSeconds,
   differenceInMilliseconds,
 } from 'date-fns';
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Input, Button, Spinner } from '@material-tailwind/react';
 import { ArrowPathIcon } from '@heroicons/react/24/outline';
 
 import './App.css';
+
+const getWindowDimensions = () => {
+  const { innerWidth: width, innerHeight: height } = window || {
+    innerWidth: 0,
+    innerHeight: 0,
+  };
+
+  return {
+    width,
+    height,
+  };
+};
 
 const App = () => {
   const searchFrequencyInMinutes = 5;
@@ -23,6 +35,10 @@ const App = () => {
   const [searchResults, setSearchResults] = useState(null);
   const [searchActive, setSearchActive] = useState(false);
   const [timedSearchActive, setTimedSearchActive] = useState(false);
+  const [windowDimensions, setWindowDimensions] = useState(
+    getWindowDimensions()
+  );
+  const [isMobile, setIsMobile] = useState(true);
   const lithuanianToEnglishMap = {
     Ą: 'A',
     Č: 'C',
@@ -51,7 +67,18 @@ const App = () => {
     axios
       .get('https://ipr.esveikata.lt/api/searchesNew/institutions')
       .then(({ data }) => setInstitutions(data.data));
+
+    const handleResize = () => {
+      setWindowDimensions(getWindowDimensions());
+    };
+
+    window?.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
   }, []);
+
+  useEffect(() => {
+    windowDimensions?.width < 768 ? setIsMobile(true) : setIsMobile(false);
+  }, [windowDimensions]);
 
   useEffect(() => {
     if (search?.length > 2) {
@@ -207,7 +234,7 @@ const App = () => {
             Gydytojo paieška
           </h1>
           <div className='w-full flex justify-center'>
-            <div className='m-auto flex w-[40rem] md:w-[60rem] gap-6 flex-col'>
+            <div className='m-auto flex w-[40rem] md:w-[60rem] gap-6 flex-col overflow-hidden'>
               <div className='w-full flex items-center flex-col md:flex-row gap-1 md:gap-2'>
                 <div className='relative flex w-full items-center h-16 md:h-10'>
                   <Input
@@ -293,7 +320,7 @@ const App = () => {
                       <thead>
                         <tr className='text-left'>
                           <th>Paslauga</th>
-                          <th>Įstaiga</th>
+                          {!isMobile && <th>Įstaiga</th>}
                           <th>Laikas</th>
                           <th>Nuoroda</th>
                         </tr>
@@ -310,10 +337,12 @@ const App = () => {
                                   {result?.healthcareServiceName ||
                                     'Nerastas paslaugos pavadinimas'}
                                 </td>
-                                <td className='text-left'>
-                                  {result?.organizationName ||
-                                    'Nerastas įstaigos pavadinimas'}
-                                </td>
+                                {!isMobile && (
+                                  <td className='text-left'>
+                                    {result?.organizationName ||
+                                      'Nerastas įstaigos pavadinimas'}
+                                  </td>
+                                )}
                                 <td className='text-left'>
                                   {format(
                                     new Date(
@@ -341,10 +370,12 @@ const App = () => {
                           })) || (
                           <>
                             <tr>
-                              <td colSpan={4}>Nerasta rezultatų.</td>
+                              <td colSpan={isMobile ? 3 : 4}>
+                                Nerasta rezultatų.
+                              </td>
                             </tr>
                             <tr>
-                              <td colSpan={4}>
+                              <td colSpan={isMobile ? 3 : 4}>
                                 Naudokite automatinę paiešką norėdami gauti
                                 rezultatus, kai atsiras talonėlių.
                               </td>
