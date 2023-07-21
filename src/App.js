@@ -96,6 +96,15 @@ const App = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedSpecialist]);
 
+  useEffect(() => {
+    if (timedSearchActive && searchResults?.length > 0) {
+      alert('Rasta rezultatų');
+      // send sms or e-mail here
+      //
+      setTimedSearchActive(false);
+    }
+  }, [searchResults, timedSearchActive]);
+
   const handleSpecialistSearch = () => {
     setFilteredSpecialists(
       specialists
