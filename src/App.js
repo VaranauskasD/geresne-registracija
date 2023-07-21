@@ -244,10 +244,21 @@ const App = () => {
                 />
               </div>
               <Button
+                id='automatic_search'
                 disabled={!selectedSpecialist}
                 variant={timedSearchActive ? 'outlined' : 'filled'}
                 color='orange'
-                className='w-full md:w-auto flex justify-between min-w-[13rem] items-center gap-3 h-10 md:h-10 p-2'
+                className={classNames(
+                  'w-full md:w-auto flex justify-between min-w-[13rem] items-center gap-3 h-10 md:h-10 p-2',
+                  {
+                    'hover:shadow-lg hover:shadow-orange-500/40 focus:opacity-[0.85] focus:bg-orange-800 focus:shadow-none active:opacity-[0.85] active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none':
+                      !timedSearchActive,
+                  },
+                  {
+                    'hover:shadow-lg hover:shadow-orange-500/40 focus:opacity-[0.85]  focus:bg-white focus:shadow-none active:opacity-[0.85] active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none':
+                      timedSearchActive,
+                  }
+                )}
                 onClick={(event) => {
                   handleTimedSearch(event);
                 }}
@@ -373,8 +384,14 @@ const App = () => {
                           </tr>
                           <tr>
                             <td colSpan={isMobile ? 3 : 4}>
-                              Naudokite automatinę paiešką norėdami gauti
-                              rezultatus, kai atsiras talonėlių.
+                              Naudokite automatinę paiešką{' '}
+                              <a
+                                href='#automatic_search'
+                                className='text-orange-600 font-bold'
+                              >
+                                Tikrinti kas 5 minutes
+                              </a>{' '}
+                              norėdami gauti rezultatus, kai atsiras talonėlių.
                             </td>
                           </tr>
                         </>
